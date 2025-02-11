@@ -46,12 +46,23 @@
     <textarea id="responseData" readonly></textarea>
 
     <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedClientId = localStorage.getItem("google_client_id");
+            if (savedClientId) {
+                document.getElementById("clientId").value = savedClientId;
+            }
+        });
+
         function loginComGoogle() {
-            const clientId = document.getElementById("clientId").value;
+            const clientIdInput = document.getElementById("clientId");
+            const clientId = clientIdInput.value.trim();
+
             if (!clientId) {
                 alert("Por favor, insira sua Client ID.");
                 return;
             }
+
+            localStorage.setItem("google_client_id", clientId);
 
             google.accounts.id.initialize({
                 client_id: clientId,
@@ -62,11 +73,8 @@
         }
 
         function respostaGoogle(response) {
-            const tokenElement = document.getElementById("token");
-            const responseDataElement = document.getElementById("responseData");
-
-            tokenElement.innerText = "Token recebido: " + response.credential;
-            responseDataElement.value = JSON.stringify(response, null, 4); // Formata o JSON com identação
+            document.getElementById("token").innerText = "Token recebido: " + response.credential;
+            document.getElementById("responseData").value = JSON.stringify(response, null, 4);
 
             // Habilita o botão de copiar
             document.getElementById("copyBtn").disabled = false;
