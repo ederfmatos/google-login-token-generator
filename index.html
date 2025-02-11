@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login com Google</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+        input, button, textarea {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        p {
+            margin-top: 20px;
+            font-weight: bold;
+            color: green;
+            word-break: break-all;
+        }
+        textarea {
+            width: 80%;
+            height: 150px;
+            resize: none;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Autenticação com Google</h2>
+    <input type="text" id="clientId" placeholder="Insira sua Client ID do Google">
+    <button onclick="loginComGoogle()">Login com Google</button>
+    <button id="copyBtn" onclick="copiarToken()" disabled>Copiar Token</button>
+
+    <p id="token"></p>
+    <h3>Detalhes da Resposta:</h3>
+    <textarea id="responseData" readonly></textarea>
+
+    <script>
+        function loginComGoogle() {
+            const clientId = document.getElementById("clientId").value;
+            if (!clientId) {
+                alert("Por favor, insira sua Client ID.");
+                return;
+            }
+
+            google.accounts.id.initialize({
+                client_id: clientId,
+                callback: respostaGoogle
+            });
+
+            google.accounts.id.prompt();
+        }
+
+        function respostaGoogle(response) {
+            const tokenElement = document.getElementById("token");
+            const responseDataElement = document.getElementById("responseData");
+
+            tokenElement.innerText = "Token recebido: " + response.credential;
+            responseDataElement.value = JSON.stringify(response, null, 4); // Formata o JSON com identação
+
+            // Habilita o botão de copiar
+            document.getElementById("copyBtn").disabled = false;
+        }
+
+        function copiarToken() {
+            const tokenText = document.getElementById("token").innerText.replace("Token recebido: ", "");
+            if (!tokenText) return;
+
+            navigator.clipboard.writeText(tokenText).then(() => {
+                alert("Token copiado para a área de transferência!");
+            }).catch(err => {
+                alert("Erro ao copiar: " + err);
+            });
+        }
+    </script>
+
+</body>
+</html>
